@@ -1,7 +1,7 @@
 class Department {
-  // private readonly id: string;
+  // private readonly id: string; being private makes it accessible only withing the class, inheritance can't access it
   // private name: string; //default is 'public'
-  private employees: string[] = []; // being private makes it accessible only withing the class
+  protected employees: string[] = []; // 'protected' makes it accessible from classes that inherit this class
 
   //Shorthand Initialization
   constructor(private readonly id: string, public name: string) {
@@ -32,6 +32,42 @@ class ITDepartment extends Department {
   }
 }
 
+class AccountingDepartment extends Department {
+  private lastReport: string;
+
+  get mostRecentReport() {
+    if (this.lastReport) {
+      return this.lastReport;
+    }
+    throw new Error('No report available');
+  }
+
+  set mostRecentReport(value: string) {
+    if (!value) {
+      throw new Error('Pass a valid value');
+    }
+    this.addReport(value);
+  }
+
+  constructor(id: string, private reports: string[]) {
+    super(id, 'Accounting');
+    this.lastReport = reports[0];
+  }
+
+  addEmployee(name: string) {
+    if (name === 'Max') {
+      return;
+    } else {
+      this.employees.push(name);
+    }
+  }
+
+  addReport(text: string) {
+    this.reports.push(text);
+    this.lastReport = text;
+  }
+}
+
 const itDepartment = new ITDepartment('d2', ['Lola']);
 itDepartment.addEmployee('Derrick');
 itDepartment.addEmployee('James');
@@ -39,7 +75,11 @@ itDepartment.addEmployee('James');
 itDepartment.printEmployeeInformation();
 itDepartment.describe();
 
-const accounting = new Department('d1', 'Accounting');
+const accounting = new AccountingDepartment('d1', []);
+
+accounting.mostRecentReport = 'Year end report';
+accounting.addReport('Hello world');
+console.log(accounting.mostRecentReport);
 //Add employees
 accounting.addEmployee('Max');
 accounting.addEmployee('Rex');
